@@ -1,0 +1,6 @@
+services:
+  test:
+    extends:
+      file: compose.yaml
+      service: php
+    command: ["sh", "tests/smoke.sh", "http://nginx"]
