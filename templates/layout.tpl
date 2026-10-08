@@ -4,12 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{$pageTitle}</title>
-    <script src="/assets/theme.js"></script>
-    <link rel="stylesheet" href="/assets/app.css">
+    <meta name="color-scheme" content="light dark">
+    <script src="/assets/theme.js?v={$assetVersions.theme}"></script>
+    <link rel="stylesheet" href="/assets/app.css?v={$assetVersions.css}">
 </head>
 <body>
-    <header>
-        <a class="brand" href="/">Заметки разработчика</a>
+    <header class="site-header">
+        <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">з.</span> Заметки разработчика</a>
         <nav aria-label="Основная навигация">
             <a href="/">Журнал</a>
             <a href="/articles">Все статьи</a>
@@ -36,5 +37,6 @@
         {block name="content"}{/block}
     </main>
     <footer>О PHP, базах данных и повседневной разработке.</footer>
+    {block name="scripts"}{/block}
 </body>
 </html>

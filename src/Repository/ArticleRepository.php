@@ -43,6 +43,24 @@ class ArticleRepository
         return $query->fetch() ?: null;
     }
 
+    public function findPopular(): array
+    {
+        return $this->pdo->query(
+            'SELECT id, image, title, description, published_at, views FROM articles
+             ORDER BY views DESC, published_at DESC, id DESC LIMIT 3'
+        )->fetchAll();
+    }
+
+    public function incrementViews(int $id): ?int
+    {
+        $query = $this->pdo->prepare('UPDATE articles SET views = views + 1 WHERE id = ?');
+        $query->execute([$id]);
+        $query = $this->pdo->prepare('SELECT views FROM articles WHERE id = ?');
+        $query->execute([$id]);
+        $views = $query->fetchColumn();
+        return $views === false ? null : (int) $views;
+    }
+
     public function save(?int $id, int $authorId, array $data, string $image, string $previousImage): int
     {
         $this->pdo->beginTransaction();

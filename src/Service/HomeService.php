@@ -32,4 +32,12 @@ class HomeService
 
         return $categories;
     }
+
+    public function getPage(): array
+    {
+        return [
+            'categories' => $this->getCategories(),
+            'popular' => $this->articleRepository->findPopular(),
+        ];
+    }
 }

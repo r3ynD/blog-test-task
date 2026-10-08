@@ -17,8 +17,8 @@ class HomeController extends BaseController
 
     public function index(): void
     {
-        $this->render('home.tpl', [
-            'pageTitle' => 'Заметки разработчика', 'categories' => $this->homeService->getCategories(),
+        $this->render('home.tpl', $this->homeService->getPage() + [
+            'pageTitle' => 'Заметки разработчика',
         ]);
     }
 }

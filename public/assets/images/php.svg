@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480">
+  <rect width="960" height="480" fill="#e9e5f5"/>
+  <circle cx="810" cy="70" r="190" fill="#d9d1ef"/>
+  <circle cx="90" cy="475" r="180" fill="#d9d1ef"/>
+  <rect x="150" y="74" width="660" height="332" rx="22" fill="#303347"/>
+  <path d="M150 132h660" stroke="#555971" stroke-width="2"/>
+  <g fill="#a6a2c2"><circle cx="183" cy="103" r="7"/><circle cx="207" cy="103" r="7"/><circle cx="231" cy="103" r="7"/></g>
+  <text x="190" y="204" font-family="monospace" font-size="33" fill="#c1b1f4">&lt;?php</text>
+  <text x="190" y="265" font-family="monospace" font-size="27" fill="#b8dfce">$idea = writeSomething();</text>
+  <text x="190" y="326" font-family="monospace" font-size="27" fill="#e7e4f1">return $idea;</text>
+  <rect x="426" y="306" width="13" height="27" rx="2" fill="#bbacf1"/>
+</svg>

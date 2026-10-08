@@ -16,6 +16,7 @@ try {
         '/register' => ['GET', 'HEAD', 'POST'], '/logout' => ['POST'],
         '/article' => ['GET', 'HEAD', 'POST'], '/article/new' => ['GET', 'HEAD', 'POST'],
         '/article/edit' => ['GET', 'HEAD', 'POST'], '/article/delete' => ['POST'],
+        '/article/view' => ['POST'],
         '/profile' => ['GET', 'HEAD'], '/admin/users' => ['GET', 'HEAD', 'POST'],
     ];
     if (!isset($methods[$path])) {
@@ -48,7 +49,7 @@ try {
     }
     $id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 4294967295]]);
     $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 1000000]]);
-    if (!$page || (in_array($path, ['/article', '/article/edit', '/article/delete', '/profile', '/category'], true) && !$id)) {
+    if (!$page || (in_array($path, ['/article', '/article/view', '/article/edit', '/article/delete', '/profile', '/category'], true) && !$id)) {
         throw new HttpException(404, 'Страница не найдена.');
     }
     $controllers = require dirname(__DIR__) . '/config/controllers.php';
@@ -70,6 +71,9 @@ try {
             break;
         case '/article':
             $controllers['article']->show($id, $page);
+            break;
+        case '/article/view':
+            $controllers['article']->countView($id);
             break;
         case '/article/new':
         case '/article/edit':

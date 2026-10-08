@@ -1,8 +1,9 @@
-let theme = 'light';
+let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 
 try {
-    if (sessionStorage.getItem('theme') === 'dark') {
-        theme = 'dark';
+    const savedTheme = sessionStorage.getItem('theme');
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+        theme = savedTheme;
     }
 } catch {
 }

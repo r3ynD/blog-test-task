@@ -15,7 +15,7 @@ if (getenv('DB_HOST') !== 'mysql_test' || getenv('DB_NAME') !== 'blog_test') {
     throw new RuntimeException('Expected the disposable blog_test database on mysql_test.');
 }
 
-function runSeed(): void
+function runSeed(array $argv = []): void
 {
     require dirname(__DIR__) . '/bin/seed.php';
 }
@@ -61,6 +61,9 @@ try {
     }
 
     $categories = array_column($service->getCategories(), null, 'id');
+    $setViews = $pdo->prepare('UPDATE articles SET views = 10 WHERE id IN (?, ?, ?)');
+    $setViews->execute([$articleIds[0], $articleIds[1], $articleIds[3]]);
+    assert(array_column($service->getPage()['popular'], 'id') === [$articleIds[3], $articleIds[1], $articleIds[0]]);
     assert(count($categories) === 2);
     assert(!isset($categories[$categoryIds[2]]));
     assert(array_column($categories[$categoryIds[0]]['articles'], 'id') === [
@@ -83,6 +86,7 @@ try {
 
 runSeed();
 assert((int) $pdo->query('SELECT COUNT(*) FROM articles')->fetchColumn() === 12);
+assert((int) $pdo->query("SELECT COUNT(DISTINCT image) FROM articles")->fetchColumn() === 3);
 assert((int) $pdo->query('SELECT COUNT(*) FROM categories')->fetchColumn() === 4);
 assert(count($service->getCategories()) === 3);
 
@@ -94,5 +98,18 @@ $findArticle = $pdo->prepare('SELECT title FROM articles WHERE id = ?');
 $findArticle->execute([$firstId]);
 assert($findArticle->fetchColumn() === 'Manually edited article');
 assert((int) $pdo->query('SELECT COUNT(*) FROM articles')->fetchColumn() === 12);
+
+$data = require dirname(__DIR__) . '/database/seeds/blog.php';
+$oldCover = $pdo->prepare('UPDATE articles SET image = ? WHERE title = ?');
+$oldCover->execute(['/assets/images/notebook.svg', $data['articles'][1]['title']]);
+$oldCover->execute(['/assets/images/workflow.svg', $data['articles'][2]['title']]);
+runSeed(['--refresh-covers']);
+$findCover = $pdo->prepare('SELECT image FROM articles WHERE title = ?');
+$findCover->execute([$data['articles'][1]['title']]);
+assert($findCover->fetchColumn() === '/assets/images/database.svg');
+$findCover->execute([$data['articles'][2]['title']]);
+assert($findCover->fetchColumn() === '/assets/images/workflow.svg');
+$findArticle->execute([$firstId]);
+assert($findArticle->fetchColumn() === 'Manually edited article');
 
 echo 'Home and seed checks passed.' . PHP_EOL;

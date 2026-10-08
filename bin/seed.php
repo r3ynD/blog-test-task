@@ -56,7 +56,7 @@ try {
         $firstPublication = new DateTimeImmutable('2026-01-10 09:00:00');
         foreach ($data['articles'] as $index => $article) {
             $insertArticle->execute([
-                $userIds['writer'], '/assets/images/notebook.svg', $article['title'], $article['description'],
+                $userIds['writer'], $data['images'][$article['categories'][0]], $article['title'], $article['description'],
                 $article['text'], ($index * 37) % 400,
                 $firstPublication->modify('+' . $index . ' days')->format('Y-m-d H:i:s'),
             ]);
@@ -64,6 +64,15 @@ try {
             foreach ($article['categories'] as $key) {
                 $insertRelation->execute([$articleId, $categoryIds[$key]]);
             }
+        }
+    }
+
+    if (in_array('--refresh-covers', $argv ?? [], true)) {
+        $updateCover = $pdo->prepare('UPDATE articles SET image = ? WHERE title = ? AND image = ?');
+        foreach ($data['articles'] as $article) {
+            $updateCover->execute([
+                $data['images'][$article['categories'][0]], $article['title'], '/assets/images/notebook.svg',
+            ]);
         }
     }
 

@@ -30,6 +30,9 @@ class ArticleController extends BaseController
         if (!$data) {
             throw new HttpException(404, 'Статья не найдена.');
         }
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $_SESSION['article_views'][$id] ??= ['started_at' => time(), 'counted' => false];
+        }
         $error = '';
         $text = is_string($_POST['text'] ?? null) ? $_POST['text'] : '';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -48,6 +51,29 @@ class ArticleController extends BaseController
             'canEdit' => $this->service->canEdit($this->getUser(), $data['article']),
             'error' => $error, 'commentText' => $text,
         ]);
+    }
+
+    public function countView(int $id): void
+    {
+        $view = $_SESSION['article_views'][$id] ?? null;
+        if (!$view || time() - $view['started_at'] < 30) {
+            throw new HttpException(409, 'Просмотр пока не засчитан.');
+        }
+        if (!$view['counted']) {
+            $views = $this->articles->incrementViews($id);
+            if ($views === null) {
+                throw new HttpException(404, 'Статья не найдена.');
+            }
+            $_SESSION['article_views'][$id]['counted'] = true;
+        } else {
+            $article = $this->articles->findById($id);
+            if (!$article) {
+                throw new HttpException(404, 'Статья не найдена.');
+            }
+            $views = $article['views'];
+        }
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['views' => $views], JSON_THROW_ON_ERROR);
     }
 
     public function edit(?int $id): void

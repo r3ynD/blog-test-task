@@ -1,6 +1,6 @@
 {extends file="layout.tpl"}
 {block name="content"}
-    <article class="reading-width full-article">
+    <article class="reading-width full-article" data-article-id="{$article.id}" data-csrf="{$csrf}">
         <div class="tags">
             {foreach $categories as $category}<a href="/category?id={$category.id}">{$category.name}</a>{/foreach}
         </div>
@@ -9,7 +9,7 @@
         <div class="article-meta">
             {if $article.author_id}<a href="/profile?id={$article.author_id}">{$article.author_name}</a>{else}<span>Редакция</span>{/if}
             <time datetime="{$article.published_at|date_format:'%Y-%m-%d'}">{$article.published_at|date_format:'%d.%m.%Y'}</time>
-            <span>Просмотры: {$article.views}</span>
+            <span>Просмотры: <span id="article-views">{$article.views}</span></span>
         </div>
         <img class="article-cover" src="{$article.image}" alt="Обложка статьи «{$article.title}»">
         <div class="article-text">{$article.text}</div>
@@ -61,3 +61,4 @@
         </nav>
     </section>
 {/block}
+{block name="scripts"}<script src="/assets/article-view.js?v={$assetVersions.view}" defer></script>{/block}

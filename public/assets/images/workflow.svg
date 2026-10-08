@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480">
+  <rect width="960" height="480" fill="#f2e6d7"/>
+  <path d="M0 360h960v120H0Z" fill="#dfc8aa"/>
+  <rect x="130" y="70" width="475" height="285" rx="18" fill="#50616a"/>
+  <rect x="149" y="89" width="437" height="239" rx="6" fill="#22343c"/>
+  <g font-family="monospace" font-size="25"><text x="180" y="145" fill="#f2c67e">$ make test</text><text x="180" y="201" fill="#a5c7b3">checks passed.</text><text x="180" y="257" fill="#f4f2e9">$ _</text></g>
+  <path d="M330 355h74v22h78v16H252v-16h78Z" fill="#50616a"/>
+  <rect x="660" y="157" width="156" height="205" rx="9" fill="#fcf8ef" transform="rotate(9 738 260)"/>
+  <g stroke="#bbad95" stroke-width="5"><path d="m689 202 92 14m-99 26 76 12m-82 29 89 14"/></g>
+  <path d="M711 380h101v22a43 43 0 0 1-43 43h-15a43 43 0 0 1-43-43Z" fill="#a66e49"/>
+  <path d="M812 387c38-7 38 39-8 31" fill="none" stroke="#a66e49" stroke-width="10"/>
+</svg>
