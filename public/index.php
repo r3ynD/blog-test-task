@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Controller\HomeController;
+use App\Repository\ArticleRepository;
+use App\Repository\CategoryRepository;
+use App\Service\HomeService;
+
 header('Content-Type: text/html; charset=utf-8');
 
 if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
@@ -17,13 +22,17 @@ try {
 
     switch ($path) {
         case '/':
-            $smarty->assign('pageTitle', 'Blog');
-            $smarty->display('home.tpl');
+            $pdo = require dirname(__DIR__) . '/config/database.php';
+            $categoryRepository = new CategoryRepository($pdo);
+            $articleRepository = new ArticleRepository($pdo);
+            $homeService = new HomeService($categoryRepository, $articleRepository);
+            $controller = new HomeController($homeService, $smarty);
+            $controller->index();
             break;
 
         default:
             http_response_code(404);
-            $smarty->assign('pageTitle', 'Page not found');
+            $smarty->assign('pageTitle', 'Страница не найдена');
             $smarty->display('404.tpl');
     }
 } catch (Throwable $exception) {

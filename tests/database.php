@@ -37,6 +37,9 @@ assert($tables === ['article_categories', 'articles', 'categories', 'schema_migr
 assert((int) $pdo->query('SELECT COUNT(*) FROM schema_migrations')->fetchColumn() === 1);
 assert($pdo->getAttribute(PDO::ATTR_EMULATE_PREPARES) === false);
 
+$pdo->exec('DELETE FROM articles');
+$pdo->exec('DELETE FROM categories');
+
 $pdo->beginTransaction();
 
 try {

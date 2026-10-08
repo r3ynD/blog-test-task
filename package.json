@@ -1,0 +1,14 @@
+{
+  "name": "blog-test-task",
+  "private": true,
+  "scripts": {
+    "build": "sass --style=expanded --no-source-map scss/app.scss public/assets/app.css",
+    "dev": "sass --watch --no-source-map scss/app.scss:public/assets/app.css"
+  },
+  "devDependencies": {
+    "sass": "1.97.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

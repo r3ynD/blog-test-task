@@ -9,14 +9,37 @@ services:
     depends_on:
       mysql_test:
         condition: service_healthy
-      nginx:
+      nginx_test:
         condition: service_started
     command:
       - sh
       - -c
       - >
         php -d zend.assertions=1 -d assert.exception=1 tests/database.php
-        && sh tests/smoke.sh http://nginx
+        && php -d zend.assertions=1 -d assert.exception=1 tests/home.php
+        && sh tests/smoke.sh http://nginx_test
+
+  php_test:
+    extends:
+      file: compose.yaml
+      service: php
+    environment:
+      DB_HOST: mysql_test
+      DB_NAME: blog_test
+    depends_on:
+      mysql_test:
+        condition: service_healthy
+
+  nginx_test:
+    image: nginx:stable-alpine
+    environment:
+      PHP_FPM_HOST: php_test
+      NGINX_ENVSUBST_FILTER: '^PHP_FPM_HOST$$'
+    volumes:
+      - ./public:/var/www/html/public:ro
+      - ./docker/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    depends_on:
+      - php_test
 
   mysql_test:
     image: mysql:8.4
