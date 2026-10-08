@@ -3,4 +3,33 @@ services:
     extends:
       file: compose.yaml
       service: php
-    command: ["sh", "tests/smoke.sh", "http://nginx"]
+    environment:
+      DB_HOST: mysql_test
+      DB_NAME: blog_test
+    depends_on:
+      mysql_test:
+        condition: service_healthy
+      nginx:
+        condition: service_started
+    command:
+      - sh
+      - -c
+      - >
+        php -d zend.assertions=1 -d assert.exception=1 tests/database.php
+        && sh tests/smoke.sh http://nginx
+
+  mysql_test:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: blog_test
+      MYSQL_USER: ${MYSQL_USER:-blog}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+    tmpfs:
+      - /var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_ROOT_PASSWORD\" mysql -h 127.0.0.1 -u root -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s

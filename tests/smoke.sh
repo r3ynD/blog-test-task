@@ -4,6 +4,8 @@ set -eu
 
 base_url="${1:-http://localhost:8080}"
 
+curl -fsS --retry 10 --retry-connrefused --retry-delay 1 --max-time 5 -o /dev/null "$base_url/"
+
 test "$(curl -sS -o /dev/null -w '%{http_code}' "$base_url/")" = 200
 test "$(curl -sS -I -o /dev/null -w '%{http_code}' "$base_url/")" = 200
 test "$(curl -sS -o /dev/null -w '%{http_code}' "$base_url/missing")" = 404
