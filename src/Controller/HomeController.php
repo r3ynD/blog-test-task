@@ -6,17 +6,19 @@ namespace App\Controller;
 
 use App\Service\HomeService;
 use Smarty\Smarty;
+use App\Model\User;
 
-class HomeController
+class HomeController extends BaseController
 {
-    public function __construct(private HomeService $homeService, private Smarty $smarty)
+    public function __construct(private HomeService $homeService, Smarty $smarty, ?User $user = null)
     {
+        parent::__construct($smarty, $user);
     }
 
     public function index(): void
     {
-        $this->smarty->assign('pageTitle', 'Заметки разработчика');
-        $this->smarty->assign('categories', $this->homeService->getCategories());
-        $this->smarty->display('home.tpl');
+        $this->render('home.tpl', [
+            'pageTitle' => 'Заметки разработчика', 'categories' => $this->homeService->getCategories(),
+        ]);
     }
 }

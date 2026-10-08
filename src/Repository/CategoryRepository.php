@@ -23,4 +23,26 @@ class CategoryRepository
              ORDER BY c.name, c.id'
         )->fetchAll();
     }
+
+    public function findAll(): array
+    {
+        return $this->pdo->query('SELECT id, name, description FROM categories ORDER BY name, id')->fetchAll();
+    }
+
+    public function findById(int $id): ?array
+    {
+        $query = $this->pdo->prepare('SELECT id, name, description FROM categories WHERE id = ?');
+        $query->execute([$id]);
+        return $query->fetch() ?: null;
+    }
+
+    public function findByArticleId(int $id): array
+    {
+        $query = $this->pdo->prepare(
+            'SELECT c.id, c.name FROM categories c
+             JOIN article_categories ac ON ac.category_id = c.id WHERE ac.article_id = ? ORDER BY c.name, c.id'
+        );
+        $query->execute([$id]);
+        return $query->fetchAll();
+    }
 }

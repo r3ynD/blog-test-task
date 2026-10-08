@@ -8,6 +8,7 @@ services:
       NGINX_ENVSUBST_FILTER: '^PHP_FPM_HOST$$'
     volumes:
       - ./public:/var/www/html/public:ro
+      - uploads:/var/www/html/public/uploads:ro
       - ./docker/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
     depends_on:
       php:
@@ -23,12 +24,16 @@ services:
     volumes:
       - .:/var/www/html
       - smarty_compile:/var/www/html/var/templates_c
+      - uploads:/var/www/html/public/uploads
     environment:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_NAME: ${MYSQL_DATABASE:-blog}
       DB_USER: ${MYSQL_USER:-blog}
       DB_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-}
+      SEED_WRITER_PASSWORD: ${SEED_WRITER_PASSWORD:-}
+      SEED_READER_PASSWORD: ${SEED_READER_PASSWORD:-}
 
   mysql:
     image: mysql:8.4
@@ -49,3 +54,4 @@ services:
 volumes:
   mysql_data:
   smarty_compile:
+  uploads:

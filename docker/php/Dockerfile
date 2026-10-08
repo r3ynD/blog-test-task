@@ -7,6 +7,7 @@ RUN apt-get update \
     && docker-php-ext-install pdo_mysql \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /var/www/html/var/templates_c \
-    && chown www-data:www-data /var/www/html/var/templates_c
+    && mkdir -p /var/www/html/public/uploads \
+    && chown www-data:www-data /var/www/html/var/templates_c /var/www/html/public/uploads
 
 WORKDIR /var/www/html

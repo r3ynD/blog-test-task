@@ -17,11 +17,7 @@
             </div>
             <div class="article-grid">
                 {foreach $category.articles as $article}
-                    <article class="article-card">
-                        <time datetime="{$article.published_at|date_format:'%Y-%m-%d'}">{$article.published_at|date_format:'%d.%m.%Y'}</time>
-                        <h3><a href="/article?id={$article.id}">{$article.title}</a></h3>
-                        <p>{$article.description}</p>
-                    </article>
+                    {include file="partials/article-card.tpl" article=$article}
                 {/foreach}
             </div>
         </section>

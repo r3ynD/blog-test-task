@@ -33,12 +33,13 @@ runMigrations();
 $pdo = require dirname(__DIR__) . '/config/database.php';
 $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
 sort($tables);
-assert($tables === ['article_categories', 'articles', 'categories', 'schema_migrations']);
-assert((int) $pdo->query('SELECT COUNT(*) FROM schema_migrations')->fetchColumn() === 1);
+assert($tables === ['article_categories', 'articles', 'categories', 'comments', 'roles', 'schema_migrations', 'users']);
+assert((int) $pdo->query('SELECT COUNT(*) FROM schema_migrations')->fetchColumn() === 3);
 assert($pdo->getAttribute(PDO::ATTR_EMULATE_PREPARES) === false);
 
 $pdo->exec('DELETE FROM articles');
 $pdo->exec('DELETE FROM categories');
+$pdo->exec('DELETE FROM users');
 
 $pdo->beginTransaction();
 
