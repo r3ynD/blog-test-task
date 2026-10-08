@@ -17,9 +17,10 @@ class ArticleRepository
     public function findLatestForHome(): array
     {
         return $this->pdo->query(
-            'SELECT category_id, id, image, title, description, published_at
+            'SELECT category_id, id, image, title, description, published_at, views,
+                    (SELECT COUNT(*) FROM comments c WHERE c.article_id = ranked.id) AS comment_count
              FROM (
-                 SELECT ac.category_id, a.id, a.image, a.title, a.description, a.published_at,
+                 SELECT ac.category_id, a.id, a.image, a.title, a.description, a.published_at, a.views,
                         ROW_NUMBER() OVER (
                             PARTITION BY ac.category_id
                             ORDER BY a.published_at DESC, a.id DESC
@@ -46,7 +47,9 @@ class ArticleRepository
     public function findPopular(): array
     {
         return $this->pdo->query(
-            'SELECT id, image, title, description, published_at, views FROM articles
+            'SELECT a.id, a.image, a.title, a.description, a.published_at, a.views,
+                    (SELECT COUNT(*) FROM comments c WHERE c.article_id = a.id) AS comment_count
+             FROM articles a
              ORDER BY views DESC, published_at DESC, id DESC LIMIT 3'
         )->fetchAll();
     }
@@ -106,7 +109,9 @@ class ArticleRepository
     public function findByAuthor(int $authorId, int $offset): array
     {
         $query = $this->pdo->prepare(
-            'SELECT id, image, title, description, published_at FROM articles
+            'SELECT a.id, a.image, a.title, a.description, a.published_at, a.views,
+                    (SELECT COUNT(*) FROM comments c WHERE c.article_id = a.id) AS comment_count
+             FROM articles a
              WHERE author_id = ? ORDER BY published_at DESC, id DESC LIMIT 6 OFFSET ?'
         );
         $query->bindValue(1, $authorId, PDO::PARAM_INT);
@@ -125,11 +130,12 @@ class ArticleRepository
     public function findSimilar(int $id): array
     {
         $query = $this->pdo->prepare(
-            'SELECT a.id, a.image, a.title, a.description, a.published_at
+            'SELECT a.id, a.image, a.title, a.description, a.published_at, a.views,
+                    (SELECT COUNT(*) FROM comments c WHERE c.article_id = a.id) AS comment_count
              FROM articles a JOIN article_categories ac ON ac.article_id = a.id
              JOIN article_categories current_categories ON current_categories.category_id = ac.category_id
              WHERE current_categories.article_id = ? AND a.id <> ?
-             GROUP BY a.id, a.image, a.title, a.description, a.published_at
+             GROUP BY a.id, a.image, a.title, a.description, a.published_at, a.views
              ORDER BY COUNT(*) DESC, a.published_at DESC, a.id DESC LIMIT 3'
         );
         $query->execute([$id, $id]);
@@ -140,7 +146,8 @@ class ArticleRepository
     {
         $order = $sort === 'views' ? 'a.views DESC, a.published_at DESC, a.id DESC' : 'a.published_at DESC, a.id DESC';
         $query = $this->pdo->prepare(
-            'SELECT a.id, a.image, a.title, a.description, a.published_at
+            'SELECT a.id, a.image, a.title, a.description, a.published_at, a.views,
+                    (SELECT COUNT(*) FROM comments c WHERE c.article_id = a.id) AS comment_count
              FROM articles a JOIN article_categories ac ON ac.article_id = a.id
              WHERE ac.category_id = ? ORDER BY ' . $order . ' LIMIT 6 OFFSET ?'
         );
@@ -163,7 +170,8 @@ class ArticleRepository
         $order = $filter->sort === 'views' ? 'a.views DESC, a.published_at DESC, a.id DESC' : 'a.published_at DESC, a.id DESC';
         $query = $this->pdo->prepare(
             'SELECT a.id, a.image, a.title, a.description, a.published_at, a.views,
-                    a.author_id, u.username AS author_username
+                    a.author_id, u.username AS author_username,
+                    (SELECT COUNT(*) FROM comments c WHERE c.article_id = a.id) AS comment_count
              FROM articles a LEFT JOIN users u ON u.id = a.author_id ' . $where . '
              ORDER BY ' . $order . ' LIMIT 6 OFFSET :offset'
         );

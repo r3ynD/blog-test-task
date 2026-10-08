@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Repository\ArticleRepository;
+use App\Dto\ArticleFilter;
 use App\Repository\CategoryRepository;
 use App\Repository\CommentRepository;
 use App\Repository\UserRepository;
@@ -65,6 +66,28 @@ try {
     assert(!$service->canEdit(null, $article));
     $service->addComment($ids[0], $readerId, '<script>test</script>');
     assert($comments->findByArticle($ids[0], 0)[0]['text'] === '<script>test</script>');
+    $service->addComment($ids[6], $readerId, 'First comment');
+    $service->addComment($ids[6], $writerId, 'Second comment');
+    $setViews = $pdo->prepare('UPDATE articles SET views = 2000000 WHERE id = ?');
+    $setViews->execute([$ids[6]]);
+    $secondCategoryId = (int) $pdo->query('SELECT MAX(id) FROM categories')->fetchColumn();
+    $relation->execute([$ids[0], $secondCategoryId]);
+    $relation->execute([$ids[6], $secondCategoryId]);
+    foreach ([
+        $articles->findLatestForHome(),
+        $articles->findPopular(),
+        $articles->findByCategory($categoryId, 'date', 0),
+        $articles->findByAuthor($writerId, 0),
+        $articles->findFiltered(ArticleFilter::fromQuery([]), 0),
+        $articles->findSimilar($ids[0]),
+    ] as $rows) {
+        $cards = array_column($rows, null, 'id');
+        assert(isset($cards[$ids[6]]));
+        assert($cards[$ids[6]]['views'] === 2000000);
+        assert($cards[$ids[6]]['comment_count'] === 2);
+    }
+    $cards = array_column($articles->findByCategory($categoryId, 'date', 0), null, 'id');
+    assert($cards[$ids[5]]['comment_count'] === 0);
     $similarIds = array_column($articles->findSimilar($ids[0]), 'id');
     assert(count($similarIds) === 3 && !in_array($ids[0], $similarIds, true));
     assert($similarIds === [$ids[6], $ids[5], $ids[4]]);
